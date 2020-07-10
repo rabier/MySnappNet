@@ -1,7 +1,8 @@
 # MySnappNet
 SnappNet is a new Bayesian method dedicated to phylogenetic network inference
 
-See the submitted paper "On the inference of complex phylogenetic networks by Markov Chain Monte-Carlo"
+******************************************************************************************************************
+SnappNet is described in the submitted paper "On the inference of complex phylogenetic networks by Markov Chain Monte-Carlo"
 
 by Charles-Elie Rabier, Vincent Berry, Jean-Christophe Glaszmann, Fabio Pardi, Scornavacca Celine 
 
