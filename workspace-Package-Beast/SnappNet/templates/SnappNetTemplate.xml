@@ -1,0 +1,475 @@
+<beast version='2.6'
+       namespace="SnappNet:beast.core:beast.core.util:beast.evolution.alignment:beast.evolution.tree.coalescent:beast.evolution.operators:beast.evolution.sitemodel:beast.evolution.substitutionmodel:beast.evolution.branchratemodel:beast.evolution.likelihood:beast.math.distributions:beast.app.beauti"
+       templateinfo='template for SnapNet'>
+
+
+<map name='connect'>beast.app.beauti.BeautiConnector</map>
+<map name='subtemplate'>beast.app.beauti.BeautiSubTemplate</map>
+
+
+    <beauticonfig spec='BeautiConfig'
+        inputLabelMap='beast.evolution.sitemodel.SiteModel.substModel=,
+            beast.core.parameter.RealParameter.estimate=Sample,
+            beast.core.parameter.IntegerParameter.estimate=Sample,
+            beast.core.parameter.BooleanParameter.estimate=Sample,
+            snappNetProject.core.non-polymorphic=Include non-polymorphic sites,
+            snappNetProject.operators.AddReticulation.boundReticulationNumber=Bound the number of reticulations,
+            snappNetProject.operators.AddReticulation.maxReticulationNumber=maxReticulationNumber'
+        inlinePlugins ='beast.core.MCMC.distribution,
+            beast.core.MCMC.logger,
+            beast.evolution.sitemodel.SiteModel.substModel,
+            beast.evolution.tree.coalescent.ExponentialGrowth,
+            beast.evolution.tree.coalescent.ConstantPopulation,
+            beast.evolution.tree.coalescent.Coalescent'
+        collapsedPlugins ='beast.core.MCMC.logger'
+        suppressPlugins = 'beast.core.MCMC.operator,
+            beast.core.MCMC.state,
+            beast.core.MCMC.distribution,
+            beast.core.MCMC.stateDistribution,
+            beast.core.MCMC.init,
+            beast.core.MCMC.sampleFromPrior,
+            beast.core.MCMC.operatorschedule, 
+            beast.core.Logger.sanitiseHeaders,
+            beast.core.Logger.sort,
+            beast.evolution.sitemodel.SiteModel.mutationRate,
+            beast.evolution.sitemodel.SiteModel.gammaCategoryCount,
+            beast.evolution.sitemodel.SiteModel.proportionInvariant,
+            beast.evolution.speciation.BirthDeathGernhard08Model.relativeDeathRate,
+            beast.evolution.speciation.BirthDeathGernhard08Model.treeIntervals,
+            beast.evolution.speciation.BirthDeathGernhard08Model.type,
+            beast.evolution.speciation.BirthDeathGernhard08Model.sampleProbability,
+            beast.evolution.speciation.BirthDeathGernhard08Model.tree,
+            beast.evolution.tree.Tree.trait,
+            beast.evolution.tree.Tree.nodetype,
+            beast.util.TreeParser.initial,
+            beast.util.TreeParser.taxa,
+            beast.util.TreeParser.trait,
+            beast.util.TreeParser.estimate,
+            beast.util.ClusterTree.initial,
+            beast.util.ClusterTree.taxa,
+            beast.util.ClusterTree.trait,
+            beast.util.ClusterTree.estimate,
+            beast.math.distributions.Prior.x,
+            beast.core.Logger.model,
+            beast.core.Logger.mode,
+            snappNetProject.core.SnappNetNetworkLikelihood.ascSiteCount,
+            snappNetProject.core.SnappNetNetworkLikelihood.useLogLikelihoodCorrection,
+            snappNetProject.core.SnappNetNetworkLikelihood.useAmbiguities,
+            snappNetProject.core.SnappNetNetworkLikelihood.useTipLikelihoods,
+            snappNetProject.core.SnappNetNetworkLikelihood.data,
+            snappNetProject.core.SnappNetNetworkLikelihood.scaling,
+            snappNetProject.core.SnappNetNetworkLikelihood.siteModel,
+            snappNetProject.core.SnappNetNetworkLikelihood.branchRateModel,
+            snappNetProject.core.SnappNetNetworkLikelihood.implementation,
+            snappNetProject.core.SnappNetNetworkLikelihood.useTipDates,
+            snappNetProject.core.SnappNetSubstitutionModel.frequencies,
+            snappNetProject.core.NetworkParser.adjustTipHeights,
+            snappNetProject.core.NetworkParser.initial,
+            snappNetProject.core.NetworkParser.taxa,
+            snappNetProject.core.Network.estimate,
+            snappNetProject.core.Network.taxa,
+            snappNetProject.core.BirthHybridizationModel.birthRate,
+            snappNetProject.core.BirthHybridizationModel.hybridRate,
+            snappNetProject.core.BirthHybridizationModel.rho,
+            snappNetProject.core.BirthHybridizationModel.network
+'
+        buttonLabelMap='beast.app.beauti.BeautiInitDlg.&gt;&gt; details=Edit parameters,
+            beast.app.beauti.BeautiInitDlg.Create new specification=Import alignment(s),
+            beast.app.beauti.BeautiInitDlg.Load existing file=Open SNAP xml file,
+            beast.app.beauti.BeautiInitDlg.Beast file:=SNAP file:,
+            beast.app.beauti.TaxonSetInputEditor.Guess taxon sets=Guess species,
+            beast.app.beauti.Beauti.Taxon sets=Taxon sets,
+            beast.app.beauti.Beauti.Site Model=Model Parameters
+            '
+        disableMenus='View.Show Data panel,View.Show Tip Dates panel,View.Show Clock Model panel,View.Show Tree prior panel,Mode'
+    >
+
+
+        <panel spec='beast.app.beauti.BeautiPanelConfig' panelname="Taxon sets" tiptext="Taxon sets" 
+            path='distribution/distribution[id="likelihood"]/distribution/data'
+            hasPartitions="none" icon='2.png' forceExpansion='FALSE'
+            type='snappNetProject.core.SnapData'
+        />
+
+        <panel spec='beast.app.beauti.BeautiPanelConfig' panelname="Model Parameters" tiptext="Specification of model parameters"
+            path='distribution/distribution[id="likelihood"]/distribution'
+            hasPartitions="none" icon='4.png' forceExpansion='TRUE'
+            buttonStatus='NONE' type='snappNetProject.core.SnappNetNetworkLikelihood'
+        />
+
+        <panel spec='beast.app.beauti.BeautiPanelConfig' panelname="Prior" tiptext="Tree and parameter priors"
+            path='distribution/distribution[id="prior"]/distribution'
+            hasPartitions="none" icon='7.png' forceExpansion='TRUE'
+        />
+
+        <panel spec='beast.app.beauti.BeautiPanelConfig' panelname="Operators" tiptext="MCMC Operator details"
+            path='operator'
+            hasPartitions="none" icon='8.png' forceExpansion='FALSE'
+            isVisible='false'
+            buttonStatus='NONE'
+        />
+        <panel spec='beast.app.beauti.BeautiPanelConfig' panelname="MCMC" tiptext="MCMC parameters"
+            path=''
+            hasPartitions="none" icon='9.png' forceExpansion='TRUE'
+        />
+
+
+        <alignmentProvider id="Add Alignment" spec='BeautiAlignmentProvider' template='@SNAPPNetPartitionTemplate'/>
+
+        <partitiontemplate id='SNAPPNetPartitionTemplate' spec='BeautiSubTemplate' class='beast.evolution.likelihood.TreeLikelihood' mainid='mcmc'>
+<![CDATA[
+
+        <data spec='snappNetProject.core.SnapData' id='snapalignment.$(n)' dataType='integer' statecount='3'>
+            <rawdata idref='$(n)'/>
+        </data>
+ 
+ 
+
+        <parameter id="originTime:species" lower="0.0" name="stateNode">0.1</parameter>
+        <parameter id="netDivRate:species" lower="0.0" name="stateNode" estimate='true'>2.0</parameter>
+        <parameter id="turnOverRate:species" lower="0.0" upper="1.0" name="stateNode" estimate='true'>0.5</parameter>
+
+
+
+        
+        <distribution spec="snappNetProject.core.SnappNetPrior" name='distribution' id='snapprior.$(n)'>
+            <parameter name='alpha' id="alpha" lower="0.0" estimate='false'> 2.0 </parameter>
+            <parameter name='beta' id="beta" lower="0.0" estimate='false'> 20.0 </parameter> 
+            <parameter name='coalescenceRate' id="coalescenceRate" lower="0.0" upper="1.0"> 0.01</parameter> 
+            <tree spec='beast.util.ClusterTree' id='Tree.$(n)' clusterType='upgma' clock.rate="1.0">
+                    <input name='taxa' idref='snapalignment.$(n)'/>
+            </tree>
+        </distribution> 
+
+        <distribution id='alphaPrior.$(n)' spec='beast.math.distributions.Prior' x='@alpha'><distr spec='OneOnX'/></distribution>
+        <distribution id='betaPrior.$(n)' spec='beast.math.distributions.Prior' x='@beta'><distr spec='OneOnX'/></distribution> 
+        <distribution id='uPrior.$(n)' spec='beast.math.distributions.Prior' x='@u'><distr spec='OneOnX'/></distribution>
+        <distribution id='vPrior.$(n)' spec='beast.math.distributions.Prior' x='@v'><distr spec='OneOnX'/></distribution>
+
+
+        <init spec="snappNetProject.core.NetworkParser" id="network:species" tree="@Tree.$(n)"/>   
+
+
+
+        <distribution id="networkPrior.$(n)" spec="snappNetProject.core.BirthHybridizationModel" network="@network:species" netDiversification="@netDivRate:species" turnOver="@turnOverRate:species" betaShape="1.0"/>
+        <prior id="networkOrigin.$(n)" name="distribution" x="@originTime:species">
+            <!-- <distr spec='Exponential' mean="0.1"/> -->
+            <distr offset="0.0" spec="Exponential">
+            <parameter name='mean' value="0.1" estimate='false'/>
+            </distr>          
+        </prior>
+        <prior id="netDivPrior.$(n)" name="distribution" x="@netDivRate:species" >
+            <!-- <distr spec='Exponential' mean="10.0"/> -->
+               <!--     <Exponential id="exponential.01" name="distr" mean="10.0"/> -->
+            <distr offset="0.0" spec="Exponential">
+             <parameter name='mean' value="10.0" estimate='false'/>
+            </distr>
+        </prior>
+        <prior id="turnOverPrior.$(n)" name="distribution" x="@turnOverRate:species">
+            <distr spec='Beta'>
+            <!-- <distr spec='Beta' alpha="1.0" beta="1.0" estimate='false'/> -->
+                <!--    <Beta id="betadistr.01" name="distr" alpha="1.0" beta="1.0"/> -->
+                 <parameter name='alpha' value="1.0" estimate='false'/>
+                 <parameter name='beta' value="1.0" estimate='false'/>
+             </distr>
+        </prior>
+
+
+        <distribution id="treeLikelihood.$(n)" spec="snappNetProject.core.SnappNetNetworkLikelihood" data='@snapalignment.$(n)' speciesNetwork="@network:species" tree='@Tree.$(n)' non-polymorphic='true'>
+                <siteModel spec='sitemodel.SiteModel' id="MutationSiteModel.$(n)">
+                <parameter name='mutationRate' id='mutationRate' value='1.0' estimate='false'/>
+                <parameter name='proportionInvariant' id='proportionInvariant' value='0.0' estimate='false'/>
+                <parameter name='shape' value='2.0' id='shape' estimate='false'/>
+                <substModel spec='snappNetProject.core.SnappNetSubstitutionModel' id='MutationModel' coalescenceRate='@coalescenceRate'>
+                      <parameter name='mutationRateV' id='v' value='1.0' lower='0.0' estimate='true'/>
+                      <parameter name='mutationRateU' id='u' value='1.0' lower='0.0' estimate='true'/>
+                </substModel>
+                </siteModel>
+        </distribution>
+
+
+  
+        <operator id="divrRateScale:species" spec="ScaleOperator" parameter="@netDivRate:species" scaleFactor="0.5" weight="10.0"/>
+        <operator id="turnOverScale:species" spec="ScaleOperator" parameter="@turnOverRate:species" scaleFactor="0.5" weight="10.0"/>
+        <operator id="gammaProbUniform:species" spec="snappNetProject.operators.InheritanceProbUniform" speciesNetwork="@network:species" weight="10.0"/>
+        <operator id="gammaProbRndWalk:species" spec="snappNetProject.operators.InheritanceProbRndWalk" speciesNetwork="@network:species" weight="10.0"/>
+        
+        <operator id="originMultiplier:species" spec="snappNetProject.operators.OriginMultiplier" speciesNetwork="@network:species" origin="@originTime:species" weight="5.0"/>
+
+
+        <operator id="addReticulation:species" spec="snappNetProject.operators.AddReticulation" speciesNetwork="@network:species" weight="10.0" coalescenceRate='@coalescenceRate' boundReticulationNumber='true' maxReticulationNumber="2"/>
+        
+        <operator id="deleteReticulation:species" spec="snappNetProject.operators.DeleteReticulation" speciesNetwork="@network:species" weight="10.0"  coalescenceRate='@coalescenceRate'/>
+
+        <operator id="networkMultiplier:species" spec="snappNetProject.operators.NetworkMultiplier" speciesNetwork="@network:species" origin="@originTime:species" weight="5.0"/>
+        
+        <operator id="flipReticulation:species" spec="snappNetProject.operators.FlipReticulation" speciesNetwork="@network:species" weight="10.0"/>
+        
+        <operator id="relocateBranch:species" spec="snappNetProject.operators.RelocateBranch" speciesNetwork="@network:species" weight="10.0"/>
+        
+        <operator id="nodeSlider:species" spec="snappNetProject.operators.NodeSlider" speciesNetwork="@network:species" origin="@originTime:species" isNormal="true" sigma="0.005" weight="10.0"/>  
+
+        <operator id="NodeUniform:species" spec="snappNetProject.operators.NodeUniform" speciesNetwork="@network:species" weight="10.0"/>
+
+        <operator id="relocateBranchNarrow:species" spec="snappNetProject.operators.RelocateBranchNarrow" speciesNetwork="@network:species" weight="10.0"/>
+
+        <operator id="ChangeUAndV" spec="snappNetProject.operators.ChangeUAndV" u="@u" v="@v" window="0.1"  weight="10.0"/> 
+        
+        <operator id='ChangeGamma' spec="snappNetProject.operators.ChangeGamma"  scale='0.5' weight="150.0" coalescenceRate='@coalescenceRate'/> 
+     
+        <operator id='ChangeAllGamma' spec="snappNetProject.operators.ChangeAllGamma"  scale='0.5' weight="150.0" coalescenceRate='@coalescenceRate'/>
+
+
+        <logger id="specieslog" fileName="test_3s.xml.species.trees" logEvery="1000" mode="tree">
+            <log id="networkLogger:species" spec="snappNetProject.core.NetworkWithMetaDataLogger" speciesNetwork="@network:species" coalescenceRate='@coalescenceRate'/>
+        </logger>
+
+]]>
+
+        
+            <connect spec='BeautiConnector' srcID='treeLikelihood.$(n)' targetID='likelihood' inputName='distribution' if='isInitializing'/>
+
+            <connect spec='BeautiConnector' srcID='originTime:species' targetID='state' inputName='stateNode' if='originTime:species/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='netDivRate:species' targetID='state' inputName='stateNode' if='netDivRate:species/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='turnOverRate:species' targetID='state' inputName='stateNode' if='turnOverRate:species/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='u' targetID='state' inputName='stateNode' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='v' targetID='state' inputName='stateNode' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='coalescenceRate' targetID='state' inputName='stateNode' if='coalescenceRate/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='alpha' targetID='state' inputName='stateNode' if='alpha/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='beta' targetID='state' inputName='stateNode' if='beta/estimate=true'/> 
+
+            <connect spec='BeautiConnector' srcID='network:species' targetID='state' inputName='stateNode'/>
+
+             
+
+
+            <connect spec='BeautiConnector' srcID='snapprior.$(n)' targetID='prior' inputName='distribution'/>
+            <connect spec='BeautiConnector' srcID='networkPrior.$(n)' targetID='prior' inputName='distribution'/>
+            <connect spec='BeautiConnector' srcID='networkOrigin.$(n)' targetID='prior' inputName='distribution'/>
+            <connect spec='BeautiConnector' srcID='turnOverPrior.$(n)' targetID='prior' inputName='distribution'/>
+            <connect spec='BeautiConnector' srcID='netDivPrior.$(n)' targetID='prior' inputName='distribution'/>
+            <connect spec='BeautiConnector' srcID='uPrior.$(n)' targetID='prior' inputName='distribution' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='vPrior.$(n)' targetID='prior' inputName='distribution' if='u/estimate=true'/>
+
+
+
+             
+            <connect spec='BeautiConnector' srcID='divrRateScale:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='turnOverScale:species' targetID='mcmc' inputName='operator'/>    
+            <connect spec='BeautiConnector' srcID='gammaProbUniform:species' targetID='mcmc' inputName='operator'/> 
+            <connect spec='BeautiConnector' srcID='gammaProbRndWalk:species' targetID='mcmc' inputName='operator'/> 
+            <connect spec='BeautiConnector' srcID='originMultiplier:species' targetID='mcmc' inputName='operator'/> 
+            <connect spec='BeautiConnector' srcID='addReticulation:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='deleteReticulation:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='networkMultiplier:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='flipReticulation:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='relocateBranch:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='nodeSlider:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='NodeUniform:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='relocateBranchNarrow:species' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='ChangeUAndV' targetID='mcmc' inputName='operator' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='ChangeGamma' targetID='mcmc' inputName='operator'/>
+            <connect spec='BeautiConnector' srcID='ChangeAllGamma' targetID='mcmc' inputName='operator'/>
+        
+
+
+            <connect spec='BeautiConnector' srcID='u' targetID='tracelog' inputName='log' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='v' targetID='tracelog' inputName='log' if='u/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='netDivRate:species' targetID='tracelog' inputName='log' if='netDivRate:species/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='turnOverRate:species' targetID='tracelog' inputName='log' if='turnOverRate:species/estimate=true'/>
+            <connect spec='BeautiConnector' srcID='originTime:species' targetID='tracelog' inputName='log' if='originTime:species/estimate=true'/>
+         
+
+            <connect spec='BeautiConnector' srcID='specieslog' targetID='mcmc' inputName='logger'/>
+
+
+
+       </partitiontemplate>
+
+
+
+        <mergepoint id='commonTemplates'/> 
+
+<!-- Random tree -->
+
+        <subtemplate id='RandomTree' spec='BeautiSubTemplate' class='beast.evolution.tree.RandomTree' mainid='RandomTree.$(n)'>
+<![CDATA[
+            <tree spec='beast.evolution.tree.RandomTree' id='RandomTree.$(n)' estimate='false' trait='@datetrait.$(n)'>
+                <taxa spec='Alignment' idref='data'/>
+                <populationModel id='ConstantPopulation.$(n)' spec='ConstantPopulation'>
+                    <popSize id='popSize.$(n)' spec='parameter.RealParameter' value='1'/>
+                </populationModel>
+            </tree>
+]]>
+        </subtemplate>
+
+<!-- Cluster tree (for UPGMA) -->
+
+        <subtemplate id='UPGMATree' spec='BeautiSubTemplate' class='beast.util.ClusterTree' mainid='UPGMATree.$(n)'>
+<![CDATA[
+        <tree spec='beast.util.ClusterTree' id='UPGMATree.$(n)' clusterType='upgma' estimate='false'  trait='@datetrait.$(n)' taxa='@$(n)'/>
+]]>
+        </subtemplate>
+
+<!-- Newick tree -->
+        <subtemplate id='NewickTree' spec='BeautiSubTemplate' class='beast.util.ClusterTree' mainid='NewickTree.$(n)'>
+<![CDATA[
+        <tree spec='beast.util.TreeParser' id='NewickTree.$(n)' estimate='false'  trait='@datetrait.$(n)'  taxa='@$(n)' newick=""/>
+]]>
+        </subtemplate>
+
+<!-- Uniform -->
+        <subtemplate id='Uniform' class='beast.math.distributions.Uniform' mainid='[top]'>
+<![CDATA[
+        <distr spec="beast.math.distributions.Uniform" lower='0' upper='Infinity'/>
+]]>
+        </subtemplate>
+
+<!-- Normal -->
+        <subtemplate id='Normal' class='beast.math.distributions.Normal' mainid='[top]'>
+<![CDATA[
+    <distr offset="0.0" spec="beast.math.distributions.Normal">
+        <parameter name='mean' value='0' estimate='false'/>
+        <parameter name='sigma' value='1' estimate='false'/>
+    </distr>
+]]>
+        </subtemplate>
+
+
+
+<!-- OneOnX -->
+        <subtemplate id='1/X' class='beast.math.distributions.OneOnX' mainid='[top]'>
+<![CDATA[
+        <distr spec="beast.math.distributions.OneOnX"/>
+]]>
+        </subtemplate>
+
+
+<!-- lognormal -->
+        <subtemplate id='LogNormal' class='beast.math.distributions.LogNormalDistributionModel' mainid='[top]'>
+<![CDATA[
+        <distr name='distr' spec="beast.math.distributions.LogNormalDistributionModel">
+            <parameter name='M' value="1" estimate='false'/>
+            <parameter name='S' value="1.25" lower="0" upper="5" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+<!-- Exponential -->
+        <subtemplate id='Exponential' class='beast.math.distributions.Exponential' mainid='[top]'>
+<![CDATA[
+        <distr offset="0.0" spec="beast.math.distributions.Exponential">
+            <parameter name='mean' value="1.0" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+
+<!-- Gamma -->
+        <subtemplate id='Gamma' class='beast.math.distributions.Gamma' mainid='[top]'>
+<![CDATA[
+        <distr offset="0.0" spec="beast.math.distributions.Gamma">
+            <parameter name='alpha' value="2" estimate='false'/>
+            <parameter name='beta' value="2" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+<!-- Beta -->
+        <subtemplate id='Beta' class='beast.math.distributions.Beta' mainid='[top]'>
+<![CDATA[
+        <distr offset="0.0" spec="beast.math.distributions.Beta">
+            <parameter name='alpha' value="2" estimate='false'/>
+            <parameter name='beta' value="2" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+<!-- Laplace -->
+        <subtemplate id='LaplaceDistribution' class='beast.math.distributions.LaplaceDistribution' mainid='[top]'>
+<![CDATA[
+        <distr offset="0.0" spec="beast.math.distributions.LaplaceDistribution">
+            <parameter name='mu' value="0" estimate='false'/>
+            <parameter name='scale' value="1" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+<!-- InverseGamma -->
+        <subtemplate id='InverseGamma' class='beast.math.distributions.InverseGamma' mainid='[top]'>
+<![CDATA[
+        <distr offset="0.0" spec="beast.math.distributions.InverseGamma">
+            <parameter name='alpha' value="2" estimate='false'/>
+            <parameter name='beta' value="2" estimate='false'/>
+        </distr>
+]]>
+        </subtemplate>
+
+<!-- Poisson -->
+        <subtemplate id='Poisson' class='beast.math.distributions.Poisson' mainid='[top]'>
+<![CDATA[
+        <distr spec='beast.math.distributions.Poisson' offset="0.0">
+            <parameter name="lambda" value="0.693"/>
+        </distr>
+]]>
+        </subtemplate>
+
+
+
+    </beauticonfig>
+
+
+   <!-- <stateNode spec="speciesnetworkBIS.Network" id="Network.t:Species" taxonset="@taxonsuperset" estimate="true"/> -->
+
+
+<!--
+<operator spec='DeltaExchangeOperator' id='FixMeanRatesOperator' weight='2' delta='0.75'/>
+-->
+
+   <!-- <taxonset spec="beast.evolution.alignment.TaxonSet" id="taxonsuperset">
+        <taxon spec="beast.evolution.alignment.TaxonSet" id="Beauti2DummyTaxonSet">
+            <taxon spec="beast.evolution.alignment.Taxon" id="dummyTaxon"/>
+        </taxon>
+    </taxonset>
+
+    <stateNode spec="speciesnetwork.Network" id="Network.t:Species" taxonset="@taxonsuperset" estimate="true"/>-->
+
+
+
+   
+
+<!-- framework for main model -->
+    <run id="mcmc" spec="MCMC" chainLength="8000000" storeEvery="1">
+
+
+        <state id='state'>
+        </state>
+        
+
+        <distribution spec="CompoundDistribution" id="posterior">
+            <distribution spec="CompoundDistribution" id="prior">
+            </distribution>
+            <distribution spec="CompoundDistribution" id="likelihood">
+            </distribution>
+        </distribution>
+ 
+
+         <logger id='screenlog' logEvery='1000' model='@posterior'>
+            <log idref='posterior'/>
+            <log id='ESS.0' spec='util.ESS' arg='@posterior'/>
+            <log idref='likelihood'/>
+            <log idref='prior'/>
+         </logger>
+ 
+        <logger id="tracelog" fileName="test_3s.xml.trace.log" logEvery="1000" model="@posterior" sort="smart">
+            <log idref="posterior"/>
+            <log idref="likelihood"/>
+            <log idref="prior"/>
+        </logger>
+
+
+
+      
+    </run>
+
+</beast>

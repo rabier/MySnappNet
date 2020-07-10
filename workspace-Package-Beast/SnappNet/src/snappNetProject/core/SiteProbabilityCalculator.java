@@ -1,0 +1,529 @@
+//analogue  of SiteProbabilityCalulator.java of Snapp,
+//but it is dedicated to SnappNet 
+
+//author CE Rabier
+
+package snappNetProject.core;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+//import java.util.Collection;
+import java.util.List;
+
+import com.google.common.collect.Multiset;
+
+import beast.core.util.Log;
+import beast.evolution.alignment.TaxonSet;
+import snappNetProject.matrix.QMatrix;
+
+
+public class SiteProbabilityCalculator {
+
+	FMatrixAugmented[] tableFMatAugmented;
+	ArrayList<NetworkNode>  networkNodesReadyToBeTreated;
+	ArrayList<NetworkNode>  networkNodesNotReadyToBeTreated;
+	
+	public SiteProbabilityCalculator(Network speciesNetwork) {    	    	     
+
+		tableFMatAugmented = new FMatrixAugmented[speciesNetwork.getBranchCount()];
+      	networkNodesReadyToBeTreated = new ArrayList <NetworkNode>();
+		networkNodesNotReadyToBeTreated = new ArrayList <NetworkNode>();
+		
+		//
+		// We will see if we need this later
+        for (int j = 0; j < speciesNetwork.getBranchCount(); j++) {         	
+        	tableFMatAugmented[j]= new FMatrixAugmented();
+        }
+		//		
+				
+		//Initialization of List of Nodes Ready to Be treated and
+        //and also the list of nodes not Ready to Be treated       
+        //Initialization of lists of Nodes Ready to Be treated 
+        // i.e. only the leaves are ready to be treated !!!  
+		final NetworkNode[] networkLeaves=speciesNetwork.getLeafNodes();       
+        for (int j = 0; j < networkLeaves.length; j++) { 
+        networkNodesReadyToBeTreated.add(networkLeaves[j]);
+        }    
+		
+        //Initialization of  List of Nodes Not Ready to Be treated 
+        // i.e. all the internal nodes are Not ready to be treated !!!     
+        final NetworkNode[] networkInternalNodes=speciesNetwork.getInternalNodes(); 
+        for (int j = 0; j < networkInternalNodes.length; j++) { 
+            networkNodesNotReadyToBeTreated.add(networkInternalNodes[j]);
+            }         
+        	
+}
+	
+	
+
+	public void printListNodes(java.util.ListIterator<NetworkNode> listIterator, boolean ready) { //throws SAXException, JAXBException {
+		//printing list of nodes just to check if our algorithm is fine !!!		
+		//other methods will use this method by calling this method in the following way
+		//  this.printListNodes(networkNodesReadyToBeTreated.listIterator(),true);
+		//  this.printListNodes(networkNodesNotReadyToBeTreated.listIterator(),false) ;  									
+		
+		if (ready==true) {
+			Log.debug.println("AWESOME !!! Here is my list of nodes ready !!!\n");}
+    			else {
+    				Log.debug.println("BOUHHHHHH !!!  Here is my list of nodes not ready  !!!\n");}            
+
+         NetworkNode myNode;
+         while(listIterator.hasNext()) {
+         	myNode = listIterator.next() ;
+         	Log.debug.println(myNode.getLabel() +" ");
+         }
+         Log.debug.println("\n");
+        
+    	
+    }
+	
+
+	
+	
+	public double computeSiteLikelihood(int [] dataAtThisSite, List<TaxonSet> taxonSets, int [] lineageCounts, Network speciesNetwork, double u, double v, 
+            Double [] coalescenceRate) throws Exception {
+								
+		leafLikelihood(dataAtThisSite, taxonSets, lineageCounts, u, v, coalescenceRate); //handle leaves branches and go to Top on those branches
+		UpdateListNodesReadyOrNot(speciesNetwork); //update the lists
+			
+        while (!networkNodesReadyToBeTreated.isEmpty()){
+        	
+        		NetworkNode nodeReady = networkNodesReadyToBeTreated.listIterator().next() ; 
+             	
+        		if (nodeReady.isReticulation()) {
+        		
+        			//case (3*), handle reticulation node        		 
+        			reticulateLikelihood(nodeReady, u, v, coalescenceRate);       		
+        			updateReticulate(nodeReady); //update the nodes to be treated or not, and also FMatrix        		
+        		}else if (nodeReady.getChildCount()>1) {
+        		//case (2*) or (4*), i.e. Handle internal node which is not reticulation node, and that have at least 2 children !!!
+        		
+        			FMatrixAugmented FMatChild1=tableFMatAugmented[nodeReady.childBranchNumbers.get(0)]; 
+        			FMatrixAugmented FMatChild2=tableFMatAugmented[nodeReady.childBranchNumbers.get(1)]; 
+    	         
+        			if  (!FMatChild1.compare(FMatChild2)) {
+        			//case (2*), since the FMatrices of the edges below are different
+        				         			
+        				internalLikelihoodTwoDifferentChildren(nodeReady, FMatChild1, FMatChild2,
+        					u, v, coalescenceRate);
+        			
+        				updateInternalLikTwoDiffChildren(nodeReady); 
+        			
+        			}else {
+        				//case (4*), since the FMatrices of the edges below are equal, ie. FMatChild1=FMatChild2        			 
+        			
+        			internalLikelihoodTwins(nodeReady, FMatChild1,  u, v, coalescenceRate);
+        			updateInternalLikTwins(nodeReady); 
+        			
+        			}
+        		
+        		
+        		}
+        	   	
+        	
+        }
+		
+        
+        //need to handle the root        
+        int branchRoot=speciesNetwork.getRoot().gammaBranchNumber;
+        FMatrixAugmented rootFMatrix=tableFMatAugmented[branchRoot];
+        
+    	double likelihoodSite=0;
+    	try {
+			likelihoodSite=doRootLikelihood(rootFMatrix, u, v, coalescenceRate[branchRoot], false);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return likelihoodSite;
+		
+	}
+	
+	
+	
+	public void leafLikelihood(int [] dataAtThisSite, List<TaxonSet> taxonSets, int [] lineageCounts, double u, double v, Double [] coalescenceRate) {
+		//compute likelihood for leaves branches, and go to Top of those branches
+				
+		//handle leaves since leaves are ready to be treated
+		//we are at bottom of these branches
+		for (int j = 0; j < networkNodesReadyToBeTreated.size(); j++) {        
+        	        	
+        		NetworkNode myNodeToTreat=networkNodesReadyToBeTreated.get(j);               	
+        		//look for taxonset with same label as NetworkLeaves[j]
+        		for (int i = 0; i < taxonSets.size(); i++) {         		
+        			if (taxonSets.get(i).getID().equals(myNodeToTreat.getLabel())){ 	
+        			        			        			        			
+        				tableFMatAugmented[myNodeToTreat.gammaBranchNumber]= new FMatrixAugmented(lineageCounts[i],
+        					dataAtThisSite[i]);  
+        			
+        			}// end if
+        		
+        	}
+        	       	
+        	tableFMatAugmented[myNodeToTreat.gammaBranchNumber].addBranchNumbersAndLocations(myNodeToTreat.gammaBranchNumber,"B");    	
+       
+       }                 
+        
+		 //Go to Top Of those branches
+        //System.out.println("Let us go to TOP for leaves !!!\n");
+		// let s move to the Top on those branches          
+        //So let us update FMatrixAugmented for the leaves by going at the top of their branches
+        for (int j = 0; j < networkNodesReadyToBeTreated.size(); j++) {         	       	
+        	try {         					
+        		NetworkNode myNodeToTreat=networkNodesReadyToBeTreated.get(j);
+				double heightBranch=myNodeToTreat.getParentByBranch(myNodeToTreat.gammaBranchNumber).getHeight();        						
+        		tableFMatAugmented[myNodeToTreat.gammaBranchNumber].goToTopLeaf(u, v, coalescenceRate[myNodeToTreat.gammaBranchNumber], heightBranch);
+        		  
+        	} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};    	
+        }          
+
+    
+		
+	}
+
+		
+	
+	public void UpdateListNodesReadyOrNot(Network speciesNetwork) {		
+		//remove all the elements (i.e. the leaves) from the list of nodes ready to be treated
+        networkNodesReadyToBeTreated.clear();
+        
+        //fill the list of nodes ready with internal nodes whose children are leaves,
+        //since at this time leaves have been treated	               
+        int countChildLeaves;
+    		int count;        
+    		Multiset<NetworkNode> children;
+    		final NetworkNode[] networkInternalNodes=speciesNetwork.getInternalNodes(); 
+    	
+        for (int j = 0; j < networkInternalNodes.length; j++) {                 	       	        	
+        	//Multiset<NetworkNode> children=NetworkSpeciationNodes[j].getChildren(); 
+        		children=networkInternalNodes[j].getChildren(); 
+        		countChildLeaves=0;
+        		count=0;
+        		for (NetworkNode n: children) {        		
+        			count = n.isLeaf() ? 1 : 0;       		
+        			countChildLeaves=countChildLeaves + count;        		
+        		}        		
+        	       	
+        		if ( countChildLeaves==children.size() ) {
+        			//the speciation node is ready to be treated
+        			networkNodesReadyToBeTreated.add(networkInternalNodes[j]);       		
+        			//remove this node from the list NetworkNodesNotReadyToBeTreated
+        			networkNodesNotReadyToBeTreated.remove(networkInternalNodes[j]);
+        		} 
+        	        	
+        } 	        	
+               
+	//this.printListNodes(networkNodesReadyToBeTreated.listIterator(),true);
+	//this.printListNodes(networkNodesNotReadyToBeTreated.listIterator(),false) ;  
+	       
+}
+		
+		
+		
+	
+	public void reticulateLikelihood(NetworkNode nodeReady, double u, double v, Double [] coalescenceRate) {
+		//compute likelihood at the Top of the two branches above retic node 
+		//handle case 3*	
+				     		
+		 int belowReticBranchNumber=0;        		 
+		 int lBranchNumber = nodeReady.gammaBranchNumber;            	 
+		 Multiset<NetworkNode> reticChild = nodeReady.getChildren();          	 
+		 for (NetworkNode n: reticChild) {        		
+			 //use for because of Multiset<NetworkNode> 
+			 belowReticBranchNumber = n.gammaBranchNumber;      		        		
+		 }           	
+		 //start with right branch
+		 int rBranchNumber=lBranchNumber+1;
+		 tableFMatAugmented[rBranchNumber]=new FMatrixAugmented(tableFMatAugmented[belowReticBranchNumber], lBranchNumber, belowReticBranchNumber,
+				 nodeReady.inheritProb); // version that fill extra dimension
+		 
+		 // Let us go to TOP on the right side    	
+		 double heightBranch=nodeReady.getParentByBranch(rBranchNumber).getHeight() - nodeReady.getHeight();     		  
+		 tableFMatAugmented[rBranchNumber].goToBotTopRetic(u, v, coalescenceRate[rBranchNumber], heightBranch);
+		
+		 // Let us go to TOP on the left side            	
+		 heightBranch=nodeReady.getParentByBranch(lBranchNumber).getHeight() - nodeReady.getHeight();           	       	
+		 tableFMatAugmented[rBranchNumber].goToTopTopRetic(u, v, coalescenceRate[lBranchNumber], heightBranch);
+   	           	
+		 
+		 //if (nodeReady.getLabel().equals("#H2")) { //if we want to print out only a given retic node
+		 /*
+		 double [] theF=tableFMatAugmented[rBranchNumber].getF();				 
+			 for (int k = 0; k < theF.length; k++) { 
+				 if (theF[k]>0.000001){
+				 System.out.println(theF[k] + " ; ");}	        	
+			 }	  
+		*/
+	}
+		
+	
+		
+	public void updateReticulate(NetworkNode nodeReady){
+		//let us update the Fmatrices and the list of Nodes
+		//it is related to case 3*
+		
+		 int lBranchNumber=nodeReady.gammaBranchNumber;
+		 int rBranchNumber=lBranchNumber + 1;
+				
+		 for (int i : tableFMatAugmented[rBranchNumber].branchNumbers) {   	
+			 
+			 if (i!=rBranchNumber) {
+				 tableFMatAugmented[i]=tableFMatAugmented[rBranchNumber];
+			 }		  		        		  		
+		 }
+			
+		 		   	
+ 		//let us update the list of nodes ready to be treated 		 
+		 updateReticulateLists(nodeReady, rBranchNumber);
+		 updateReticulateLists(nodeReady, lBranchNumber);
+		 //need to remove the retic node 
+		 networkNodesReadyToBeTreated.remove(nodeReady);
+		 //this.printListNodes(networkNodesReadyToBeTreated.listIterator(),true);
+		 //this.printListNodes(networkNodesNotReadyToBeTreated.listIterator(),false) ;  
+		
+	}
+	
+	 
+	public void updateReticulateLists(NetworkNode nodeReady, int branchNumber){
+		//related to case 3*, it is used by the method just above
+		
+		//let us update the list of nodes ready to be treated 		 	    
+ 		NetworkNode parentNode=nodeReady.getParentByBranch(branchNumber);   				
+ 		if (parentNode.isReticulation()) {  			
+ 			networkNodesReadyToBeTreated.add(parentNode);
+ 			networkNodesNotReadyToBeTreated.remove(parentNode);
+ 		}else{        			
+     		int edgeNumber;    		
+     		if (parentNode.childBranchNumbers.get(0)==branchNumber) {
+     			edgeNumber=parentNode.childBranchNumbers.get(1);		
+     		}else {
+     			edgeNumber=parentNode.childBranchNumbers.get(0);    			
+     		}     		    
+     		if (!tableFMatAugmented[edgeNumber].branchNumbers.isEmpty()) {
+     			networkNodesReadyToBeTreated.add(parentNode);
+     			networkNodesNotReadyToBeTreated.remove(parentNode);  			
+     		} 			   			 			
+ 		}
+					
+	}
+	
+	
+	
+	public void internalLikelihoodTwoDifferentChildren(NetworkNode nodeReady, FMatrixAugmented FMatChild1, FMatrixAugmented FMatChild2,
+			double u, double v, Double [] coalescenceRate) {
+		//handle case 2*
+				
+        int branchNumber = nodeReady.gammaBranchNumber;
+        int branchFirstChild=nodeReady.childBranchNumbers.get(0);
+        int branchSecondChild=nodeReady.childBranchNumbers.get(1);
+            
+        tableFMatAugmented[branchNumber]=new FMatrixAugmented(tableFMatAugmented[branchFirstChild], 
+        		tableFMatAugmented[branchSecondChild], branchFirstChild, branchSecondChild, branchNumber);
+       
+        double heightBranch=nodeReady.getParentByBranch(branchNumber).getHeight()-nodeReady.getHeight();        		
+	    tableFMatAugmented[branchNumber].goToTopInternal(u, v, coalescenceRate[branchNumber], heightBranch);    	    
+			
+	}
+			
+	
+	public void updateInternalLikTwoDiffChildren(NetworkNode nodeReady) {
+		//related to case 2*		
+		int branchNumber = nodeReady.gammaBranchNumber;		 
+		for (int i : tableFMatAugmented[branchNumber].branchNumbers) {   				
+			if (i!=branchNumber) {			
+				tableFMatAugmented[i]=tableFMatAugmented[branchNumber];
+			}		  				  		
+		}
+		
+		
+		//check if parent is ready        				
+		NetworkNode parentNode=nodeReady.getParentByBranch(branchNumber);
+		if (!parentNode.isOrigin()) {
+			if (parentNode.isReticulation()) {  			 
+				networkNodesReadyToBeTreated.add(parentNode);
+				networkNodesNotReadyToBeTreated.remove(parentNode);
+			}else {
+				int edgeNumber; 
+				if (parentNode.childBranchNumbers.get(0)==branchNumber) {
+					edgeNumber=parentNode.childBranchNumbers.get(1);		
+				}else {
+					edgeNumber=parentNode.childBranchNumbers.get(0);    			
+				}  
+			
+				if (!tableFMatAugmented[edgeNumber].branchNumbers.isEmpty()) {
+					networkNodesReadyToBeTreated.add(parentNode);
+					networkNodesNotReadyToBeTreated.remove(parentNode);  			
+				} 		
+			
+			}
+		}
+	
+		 networkNodesReadyToBeTreated.remove(nodeReady);
+		 //this.printListNodes(networkNodesReadyToBeTreated.listIterator(),true);
+		 //this.printListNodes(networkNodesNotReadyToBeTreated.listIterator(),false) ;  		
+	}
+
+	
+//////////////////////////////////////////////	
+		
+	public void internalLikelihoodTwins(NetworkNode nodeReady, FMatrixAugmented FMatChild1, double u, double v, Double [] coalescenceRate) {
+		// handle case (4*)
+
+        ArrayList <Integer>  branchAboveDescendingLeaves = new ArrayList <Integer>();
+        nodeReady.getLeafBranchNumber(branchAboveDescendingLeaves);
+         
+        int nMax=0; //will refer to the max number of lineages that go along this edge
+        for (int i=0; i<branchAboveDescendingLeaves.size(); i++) {
+        	 	 nMax += tableFMatAugmented[branchAboveDescendingLeaves.get(i)].m_n_MultiDim.get(0);
+        }
+
+        int branchNumber=nodeReady.gammaBranchNumber;
+        int branchFirstChild=nodeReady.childBranchNumbers.get(0);
+        int branchSecondChild=nodeReady.childBranchNumbers.get(1);       
+        tableFMatAugmented[branchNumber]=new FMatrixAugmented(FMatChild1, branchFirstChild, branchSecondChild, branchNumber, nMax);
+         	    	
+        //need to go at the top of the branch
+    	 	double heightBranch=nodeReady.getParentByBranch(branchNumber).getHeight()-nodeReady.getHeight();        	    	  
+    	 	tableFMatAugmented[branchNumber].goToTopInternal(u, v, coalescenceRate[branchNumber], heightBranch); 		
+	}
+		
+		
+		
+	public void updateInternalLikTwins(NetworkNode nodeReady) {
+		//related to case 4*		
+		int branchNumber = nodeReady.gammaBranchNumber;
+		for (int i : tableFMatAugmented[branchNumber].branchNumbers) {   		
+		
+			if (i!=branchNumber) {
+				tableFMatAugmented[i]=tableFMatAugmented[branchNumber];
+			}		  		
+		  		
+		}
+		
+		//check if parent is ready        				
+		NetworkNode parentNode=nodeReady.getParentByBranch(branchNumber);
+		if (!parentNode.isOrigin()) { 
+			if (parentNode.isReticulation()) {  			
+				Log.debug.println(" c est une reticulation !! \n");
+				networkNodesReadyToBeTreated.add(parentNode);
+				networkNodesNotReadyToBeTreated.remove(parentNode);
+			}else {
+				int edgeNumber;
+				Log.debug.println(" ce n'est pas une reticulation !! \n");
+				if (parentNode.childBranchNumbers.get(0)==branchNumber) {
+					edgeNumber=parentNode.childBranchNumbers.get(1);		
+				}else {
+					edgeNumber=parentNode.childBranchNumbers.get(0);    			
+				}  
+					
+				if (!tableFMatAugmented[edgeNumber].branchNumbers.isEmpty()) {
+					networkNodesReadyToBeTreated.add(parentNode);
+					networkNodesNotReadyToBeTreated.remove(parentNode);  			
+				} 		
+					
+			}
+		}
+		
+		 networkNodesReadyToBeTreated.remove(nodeReady);
+		 //this.printListNodes(networkNodesReadyToBeTreated.listIterator(),true);
+		 //this.printListNodes(networkNodesNotReadyToBeTreated.listIterator(),false) ;  
+	}	
+		
+		 
+
+	
+	/**
+	 * David Bryant 's code below
+    Determines a non-zero right e-vector for the matrix Q, defined by u,v,coalescenceRate and N.
+    The e-vector is normalised so that the entries for each n sum to 1.0
+
+    //TODO: incorporate into code for abstract matrix
+    */
+   double [][]  findRootProbabilities(int N, double u, double v, double coalescenceRate, boolean dprint) throws Exception {
+	   double [][] x;
+       QMatrix Qt = new QMatrix(N,u,v,coalescenceRate);
+       double [] xcol;
+       xcol = Qt.findOrthogonalVector(dprint);
+      
+       if (dprint) {
+           Log.debug.println("xcol = " +Arrays.toString(xcol));
+       }
+       
+       int index = 1;
+       x = new double[N+1][];
+       for(int n=1;n<=N;n++) {
+           x[n] = new double[n+1];
+           double rowsum = 0.0;
+           for(int r=0;r<=n;r++) {
+               double xcol_index = Math.max(xcol[index], 0.0);
+               rowsum += xcol_index;
+               x[n][r] = xcol_index;
+               index++;
+           }
+           for(int r=0;r<=n;r++)
+               x[n][r] = x[n][r] / rowsum;
+       }
+       return x;
+   } // findRootProbabilities
+
+   
+double doRootLikelihood(FMatrixAugmented rootFMatrix, double u, double v, double gamma, boolean dprint) throws Exception
+   {	   
+       
+       int N = rootFMatrix.getSizeMultidDim().get(0);		
+       double[][] conditional = findRootProbabilities(N, u, v, gamma, dprint);
+		
+       double sum = 0.0;
+       for(int n=1;n<=N;n++) {
+           for(int r=0;r<=n;r++) {
+        	   	double term =  conditional[n][r] * 
+        			   rootFMatrix.getF()[rootFMatrix.getLocationMultidDim(Arrays.asList(n),Arrays.asList(r))];       	   
+        	   	sum += term;
+        	   //CE we can leave this flag or not, I remove it for the moment
+        	   	// System.out.println("Voici la valeur de rootFMatrix!!!" + rootFMatrix.getF()[rootFMatrix.getLocationMultidDim(Arrays.asList(n),Arrays.asList(r))]+ "\n");
+            //   if (sum<0.0) {
+             //      System.out.println("Numerical problems"+ sum +"\n")                   
+              // }
+           }
+       }
+       return sum;
+   } // doRootLikelihood
+	
+		
+		
+	}
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

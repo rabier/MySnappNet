@@ -1,0 +1,110 @@
+#
+#model:
+#
+#<?xml version="1.0" encoding="UTF-8" standalone="no"?><input id="posterior" spec="beast.core.util.CompoundDistribution">
+#    <distribution id="prior" spec="beast.core.util.CompoundDistribution">
+#        <prior id="netDivPrior.JDD1-all-chr" name="distribution">
+#            <parameter id="netDivRate:species" lower="0.0" name="x">2.0</parameter>
+#            <Exponential id="Exponential.1" name="distr">
+#                <parameter estimate="false" id="RealParameter.3" name="mean">10.0</parameter>
+#            </Exponential>
+#        </prior>
+#        <distribution id="networkPrior.JDD1-all-chr" netDiversification="@netDivRate:species" spec="snappNetProject.core.BirthHybridizationModel">
+#            <network id="network:species" spec="snappNetProject.core.NetworkParser">
+#                <tree clusterType="upgma" id="Tree.JDD1-all-chr" spec="beast.util.ClusterTree">
+#                    <taxa dataType="integer" id="snapalignment.JDD1-all-chr" spec="snappNetProject.core.SnapData" statecount="3">
+#                        <taxonset id="Or3" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="W1943_Or3" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="W2036_Or3" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                        <taxonset id="Jap" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="B204_Jap" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="IRIS_313-11924_Jap" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                        <taxonset id="Aus" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="IRIS_313-11058_Aus" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="IRIS_313-11737_Aus" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                        <taxonset id="Ind" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="IRIS_313-11819_Ind" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="IRIS_313-11796_Ind" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                        <taxonset id="Aro" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="IRIS_313-11062_Aro" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="IRIS_313-11825_Aro" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                        <taxonset id="Or1" spec="beast.evolution.alignment.TaxonSet">
+#                            <taxon id="W3105_Or1" spec="beast.evolution.alignment.Taxon"/>
+#                            <taxon id="W1559_Or1" spec="beast.evolution.alignment.Taxon"/>
+#                        </taxonset>
+#                    </taxa>
+#                    <parameter id="RealParameter.0" lower="0.0" name="clock.rate" upper="0.0">1.0</parameter>
+#                </tree>
+#            </network>
+#            <parameter id="turnOverRate:species" lower="0.0" name="turnOver" upper="1.0">0.5</parameter>
+#            <parameter id="RealParameter.1" lower="0.0" name="betaShape" upper="0.0">1.0</parameter>
+#        </distribution>
+#        <prior id="networkOrigin.JDD1-all-chr" name="distribution">
+#            <parameter id="originTime:species" lower="0.0" name="x">0.1</parameter>
+#            <Exponential id="Exponential.0" name="distr">
+#                <parameter estimate="false" id="RealParameter.2" name="mean">0.1</parameter>
+#            </Exponential>
+#        </prior>
+#        <distribution id="snapprior.JDD1-all-chr" spec="snappNetProject.core.SnappNetPrior" tree="@Tree.JDD1-all-chr">
+#            <parameter estimate="false" id="alpha" lower="0.0" name="alpha">2.0</parameter>
+#            <parameter estimate="false" id="beta" lower="0.0" name="beta">20.0</parameter>
+#            <parameter id="coalescenceRate" lower="0.0" name="coalescenceRate" upper="1.0">0.01</parameter>
+#        </distribution>
+#        <prior id="turnOverPrior.JDD1-all-chr" name="distribution" x="@turnOverRate:species">
+#            <Beta id="Beta.0" name="distr">
+#                <parameter estimate="false" id="RealParameter.4" name="alpha">1.0</parameter>
+#                <parameter estimate="false" id="RealParameter.5" name="beta">1.0</parameter>
+#            </Beta>
+#        </prior>
+#        <prior id="uPrior.JDD1-all-chr" name="distribution">
+#            <parameter id="u" lower="0.0" name="x">1.0</parameter>
+#            <OneOnX id="OneOnX.2" name="distr"/>
+#        </prior>
+#        <prior id="vPrior.JDD1-all-chr" name="distribution">
+#            <parameter id="v" lower="0.0" name="x">1.0</parameter>
+#            <OneOnX id="OneOnX.3" name="distr"/>
+#        </prior>
+#    </distribution>
+#    <distribution id="likelihood" spec="beast.core.util.CompoundDistribution">
+#        <distribution data="@snapalignment.JDD1-all-chr" id="treeLikelihood.JDD1-all-chr" spec="snappNetProject.core.SnappNetNetworkLikelihood" speciesNetwork="@network:species" tree="@Tree.JDD1-all-chr">
+#            <siteModel id="MutationSiteModel.JDD1-all-chr" spec="beast.evolution.sitemodel.SiteModel">
+#                <parameter estimate="false" id="mutationRate" name="mutationRate">1.0</parameter>
+#                <parameter estimate="false" id="shape" name="shape">2.0</parameter>
+#                <parameter estimate="false" id="proportionInvariant" name="proportionInvariant">0.0</parameter>
+#                <substModel coalescenceRate="@coalescenceRate" id="MutationModel" mutationRateU="@u" mutationRateV="@v" spec="snappNetProject.core.SnappNetSubstitutionModel"/>
+#            </siteModel>
+#        </distribution>
+#    </distribution>
+#</input>
+#
+Sample	posterior	likelihood	prior	u	v	netDivRate:species	turnOverRate:species	originTime:species
+0	-138671.72565999685	-94675.42774794006	-43996.29791205679	1.0	1.0	2.0	0.5	0.1
+1000	-37568.994999112925	-37366.92633327723	-202.06866583569104	0.5416520833204297	6.502100737116759	0.9359630669109816	0.1923619897267772	0.1
+2000	-37569.27779121328	-37366.92633327723	-202.35145793605034	0.5416520833204297	6.502100737116759	3.7638840705040764	0.7843378528241074	0.1
+3000	-36489.509446253964	-36257.36157915653	-232.1478670974316	0.5416520833204297	6.502100737116759	4.734775103259168	0.6469198463688322	0.1
+4000	-36489.44371270139	-36257.36157915653	-232.0821335448567	0.5416520833204297	6.502100737116759	4.077439577510258	0.7334270493784412	0.1
+5000	-35737.72279834671	-35499.93808714489	-237.78471120182033	0.5416520833204297	6.502100737116759	3.0319948812143145	0.13270507776979087	0.1
+6000	-35737.607976453	-35499.93808714489	-237.66988930810913	0.5416520833204297	6.502100737116759	1.883775944102354	0.1945564419500101	0.1
+7000	-35738.234481220155	-35499.93808714489	-238.29639407526932	0.5416520833204297	6.502100737116759	8.148823615704256	0.3042248984399387	0.1
+8000	-35737.58296708996	-35499.93808714489	-237.64487994507076	0.5416520833204297	6.502100737116759	1.633682313718604	0.8594301727190625	0.1
+9000	-35738.12746486537	-35499.93808714489	-238.18937772048233	0.5416520833204297	6.502100737116759	7.0786600678344005	0.78989190202213	0.1
+10000	-35738.61971300524	-35499.93808714489	-238.68162586035248	0.5416520833204297	6.502100737116759	12.001141466535909	0.60080335057666	0.1
+11000	-37084.41327594578	-36891.40429543666	-193.00898050912207	0.5480590559176016	5.701933230411993	5.680475616610269	0.9908460463798255	0.1
+12000	-37084.021974416195	-36891.40429543666	-192.61767897953692	0.5480590559176016	5.701933230411993	1.767460320758703	0.24249447071651234	0.1
+13000	-37084.219793825796	-36891.40429543666	-192.81549838913838	0.5480590559176016	5.701933230411993	3.745654416773432	0.4283188962193009	0.1
+14000	-37084.47654895406	-36891.40429543666	-193.07225351739834	0.5480590559176016	5.701933230411993	6.313205699372934	0.8176677459780252	0.1
+15000	-37083.91131348762	-36891.40429543666	-192.50701805095972	0.5480590559176016	5.701933230411993	0.6608510349867277	0.10968505408888704	0.1
+16000	-37083.8844057667	-36891.40429543666	-192.48011033004227	0.5480590559176016	5.701933230411993	0.39177382581217735	0.0451484464041006	0.1
+17000	-36160.5701562971	-35965.76741018629	-194.80274611081126	0.5480590559176016	5.701933230411993	0.3356864857324202	0.15577008869631004	0.1
+18000	-36160.841787342535	-35965.76741018629	-195.07437715624735	0.5480590559176016	5.701933230411993	3.051996940093201	0.0899185130358538	0.1
+19000	-36160.658783169216	-35965.76741018629	-194.89137298293113	0.5480590559176016	5.701933230411993	1.221955206931098	0.9249743586252451	0.1
+20000	-36164.608130332745	-35965.76741018629	-198.84072014645636	0.5480590559176016	5.701933230411993	40.71542684218325	0.5379251253928595	0.1
+21000	-37526.36467148641	-37347.44692013667	-178.9177513497451	0.5480590559176016	5.701933230411993	1.685119308312029	0.5572049099208016	0.1
+22000	-37142.04172207823	-36929.48208779405	-212.55963428417834	0.5480590559176016	5.701933230411993	16.44278383739963	0.10507800541923937	0.1
+23000	-37141.56639124123	-36929.48208779405	-212.0843034471743	0.5480590559176016	5.701933230411993	11.689475467359273	0.6866102003784339	0.1
+24000	-37143.32806847828	-36929.48208779405	-213.84598068422753	0.5480590559176016	5.701933230411993	29.306247837891434	0.6557107842910697	0.1

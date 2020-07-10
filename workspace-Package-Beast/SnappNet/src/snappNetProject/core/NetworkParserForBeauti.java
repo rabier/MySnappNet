@@ -1,0 +1,163 @@
+package snappNetProject.core;
+import java.util.List;
+
+import beast.core.Description;
+import beast.core.Input;
+import beast.core.StateNode;
+import beast.core.StateNodeInitialiser;
+import beast.core.util.Log;
+import beast.evolution.tree.Node;
+import beast.evolution.tree.Tree;
+import beast.util.ClusterTree;
+import beast.core.Input.Validate;
+
+/**
+ * Parse the network of extended Newick format.
+ * @author Huw Ogilvie
+ * 
+ * modified by CE Rabier. Be careful, in order to make it work with Beauti (since it is very special),
+ * I had to modify initAndValidate, to obtain an appropriate network.
+ * Indeed , we need an origin node and a root node for the network, in our model.
+ * From an input tree, the code will get the names of the taxon, and then it will create
+ * a caterpillar tree , with a node origin and a node root root (thanks to the Chi Zhang 
+ * method in class Network)
+ * 
+ *
+ * Note that in our other project not suitable for Beauti, we are using the original version of 
+ * NetworkParser and the parsing is more standard.
+ * 
+ * 
+ *  
+ */
+
+
+@Description("Parse the network of extended Newick format.")
+public class NetworkParserForBeauti extends Network implements StateNodeInitialiser {
+    public final Input<Network> networkInput = new Input<>("initial", "Network to initialize.");
+    public final Input<Tree> treeInput =
+            new Input<>("tree", "Tree initialized from extended newick string.", Validate.REQUIRED);
+    public final Input<Boolean> adjustTipHeightsInput =
+            new Input<>("adjustTipHeights", "Whether tipHeights shall be adjusted (default is true).", true);
+
+    private List<String> leafOrder;
+    private int nextSpeciationNr;
+    private int nextReticulationNr;
+
+    public NetworkParserForBeauti() {
+    }
+
+    public NetworkParserForBeauti(final Tree tree) {
+    		treeInput.setValue(tree, this);
+    		initAndValidate();
+    }
+    
+    //CE : I made changes below for beauty
+    @Override
+    public void initAndValidate() {
+    		final Tree tree = treeInput.get();
+    		double minInternalHeight=0;
+    		double step=1;
+    		
+    		final List<String> taxa=((ClusterTree) tree).dataInput.get().getTaxaNames();
+            leafNodeCount = taxa.size();
+            speciationNodeCount = leafNodeCount - 1;
+            reticulationNodeCount = 0;
+            nodeCount = leafNodeCount * 2;
+            nodes = new NetworkNode[nodeCount];
+
+            int leftNr = 0;
+            nodes[leftNr] = new NetworkNode(this);
+            NetworkNode left = nodes[leftNr];
+            left.height = 0.0;
+            left.label = taxa.get(leftNr);
+            for (int rightNr = 1; rightNr < leafNodeCount; rightNr++) {
+                nodes[rightNr] = new NetworkNode(this);
+                final NetworkNode right = nodes[rightNr];
+                right.height = 0.0;
+                right.label = taxa.get(rightNr);
+                final int parentNr = leafNodeCount + (rightNr - 1);
+                nodes[parentNr] = new NetworkNode(this);
+                final NetworkNode parent = nodes[parentNr];
+                parent.height = minInternalHeight + rightNr * step;
+                parent.childBranchNumbers.add(rightNr);
+                parent.childBranchNumbers.add(leftNr);
+                // left = parent;
+                leftNr = parentNr;
+            }
+
+            // node of origin
+            nodes[nodeCount - 1] = new NetworkNode(this);
+            nodes[nodeCount - 1].height = minInternalHeight + leafNodeCount * step;
+            nodes[nodeCount - 1].childBranchNumbers.add(leftNr);
+
+            // set internal node labels
+            resetInternalNodeLabels();
+   				
+    			//end include the caterpillar
+    			updateRelationships();
+    		}
+    //END changes
+
+    private Integer rebuildNetwork(final Node treeNode) {
+
+        Integer branchNumber;
+        NetworkNode newNode;
+        final String nodeLabel = treeNode.getID();
+        final double nodeHeight = treeNode.getHeight();
+        final int matchingNodeNr = getNodeNumber(nodeLabel);
+
+        if (matchingNodeNr < 0) {
+            int newNodeNumber;
+            double inheritProb = 0.5;
+
+            if (treeNode.isRoot()) {
+                newNodeNumber = nodeCount - 1;
+            } else if (nodeLabel != null && nodeLabel.startsWith("#H")) {
+                if (treeNode.getMetaDataNames().contains("gamma"))
+                    inheritProb = (Double) treeNode.getMetaData("gamma");
+                newNodeNumber = nextReticulationNr;
+                nextReticulationNr++;
+            } else if (treeNode.isLeaf()) {
+                newNodeNumber = leafOrder.indexOf(nodeLabel);
+            } else {
+                newNodeNumber = nextSpeciationNr;
+                nextSpeciationNr++;
+            }
+            
+            newNode = nodes[newNodeNumber];
+            newNode.label = nodeLabel;
+            newNode.height = nodeHeight;
+            newNode.inheritProb = inheritProb;
+            branchNumber = getBranchNumber(newNodeNumber);
+	    
+        } else { 
+            newNode = nodes[matchingNodeNr];
+            if (treeNode.getMetaDataNames().contains("gamma")){ 
+                newNode.inheritProb = 1.0 - (double)treeNode.getMetaData("gamma");
+            }
+
+            branchNumber = getBranchNumber(matchingNodeNr) + 1;
+        }
+
+        for (Node child: treeNode.getChildren()) {
+            final Integer childBranchNr = rebuildNetwork(child);
+            newNode.childBranchNumbers.add(childBranchNr);
+        }
+
+        return branchNumber;
+    }
+
+    @Override
+    public void initStateNodes() {
+        if (networkInput.get() != null) {
+            networkInput.get().assignFrom(this);
+        }
+    }
+
+    @Override
+    public void getInitialisedStateNodes(final List<StateNode> stateNodes) {
+        if (networkInput.get() != null) {
+            stateNodes.add(networkInput.get());
+        }
+    }
+}

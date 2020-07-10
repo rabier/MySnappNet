@@ -1,0 +1,58 @@
+
+cd ~/workspace-Package-Beast/SnappNet/deliverable
+
+
+***** To run a MCMC Analysis with SnappNet
+
+java -jar SnappNetProjectToRun.jar ../example/JDD1.xml 
+
+// for developpers : from eclipse, use the debug configuration called SnappNet_MCMC
+
+// for developpers : if you want to get your own xml using Beauti, use the debug configuration SnappNet_Beauti
+
+File --> Template --> chose the template "SnappNetTemplate"
+located in folder ~/workspace-Package-Beast/SnappNet/templates
+
+Next --> add Alignements (as specified in our pdf "A rough Guide To SnappNet")
+choose for instance the file ~/workspace-Package-Beast/SnappNet/example/JDD1-all-chr.nexus
+
+and follow the steps described in our manual "A rough Guide To SnappNet".
+
+
+*** To resume a MCMC analysis 
+
+java -jar SnappNetProjectToRunResume.jar -resume ../example/JDD1.xml
+
+
+*** To perform Maximum Likelihood
+
+// for developpers : if you want to get your own xml 'JDD1ML.xml ' using Beauti, use the debug configuration SnappNet_Beauti
+File --> Template --> chose the template "SnappNetTemplateMaxLikelihood.xml"
+located in folder ~/workspace-Package-Beast/SnappNet/templates
+
+and follow the steps described in our manual "A rough Guide To SnappNet".
+
+You ll have to use the two command lines :
+java -jar SnappNetProjectToRun.jar ../example/JDD1ML.xml 
+
+java -jar SnappNetProjectToRunMaxLikelihood.jar -resume ../example/JDD1ML.xml 
+
+
+************* To perform extra Optimization
+
+// for developpers : if you want to get your own xml 'JDD1ExtraOptim.xml ' using Beauti, use the debug configuration SnappNet_Beauti
+File --> Template --> chose the template "SnappNetTemplateExtraOptim.xml"
+located in folder ~/workspace-Package-Beast/SnappNet/templates
+
+and follow the steps described in our manual "A rough Guide To SnappNet".
+
+You ll have to use the two command lines :
+
+java -jar SnappNetProjectToRun.jar ../example/JDD1ExtraOptim.xml 
+
+java -jar SnappNetProjectToRunResume.jar -resume ../example/JDD1ExtraOptim.xml  
+
+
+
+
+

@@ -1,0 +1,199 @@
+ <!-- Build SnappNet model -->
+ <project basedir="." default="build_jar_all_SnappNet" name="BUILD_SnappNet">
+ 	<description>
+ 	Build SnappNet.
+ 	JUnit test is available for this build.
+ 	$Id: build_SnappNet.xml $
+ 	</description>
+ 	<!-- set global properties for this build -->
+ 	<property name="srcSnappNet" location="src" />
+	<property name="docSnappNet" location="doc" />
+	<property name="exampleSnappNet" location="example" />
+
+ 	<property name="buildSnappNet" location="build" />
+ 	<property name="libSnappNet" location="lib" />
+ 	<property name="release_dir" value="release" />
+ 	<property name="distSnappNet" location="${buildSnappNet}/dist" />
+ 	<property name="beast2path" location="../beast2" />
+ 	<property name="libBeast2" location="${beast2path}/lib" />
+ 	<property name="srcBeast2" location="${beast2path}/src" />
+ 	<property name="beast2classpath" location="${beast2path}/build" />
+ 	<property name="Add_on_dir" value="${release_dir}/package" />
+
+ <import file="${beast2path}/build.xml" />
+ 	<property name="main_class_BEAST" value="beast.app.BeastMCMC" />
+ 	<property name="report" value="${buildSnappNet}/junitreport"/>
+
+ 	<path id="classpath">
+	<pathelement path="${buildSnappNet}"/>
+	<fileset dir="${libBeast2}" includes="*.jar"/>
+	<fileset dir="${libSnappNet}" includes="*.jar"/>
+	<fileset dir="${libSnappNet}" includes="guava-21.0.jar"/>
+	<pathelement path="${beast2classpath}"/>
+ 	</path>
+ 	
+	<!-- start -->
+ 	<target name="initSnappNet">
+ 		<echo message="${ant.project.name}: ${ant.file}" />
+ 	</target>
+
+ 	<target name="cleanSnappNet">
+ 	<delete dir="${buildSnappNet}" />
+ 	</target>
+ 	
+ 	<!-- clean previous build, and then compile Java source code, and Juint test -->
+ 	<target name="build_all_SnappNet" depends="cleanSnappNet,compile-allSnappNet,junitSnappNet" description="Clean and Build all run-time stuff">
+ 	</target>
+ 	
+ 	<!-- clean previous build, compile Java source code, and Junit test, and make the beast.jar and beauti.jar -->
+ 	<target name="build_jar_all_SnappNet" depends="cleanSnappNet,compile-allSnappNet,junitSnappNet,dist_all_SnappNet" description="Clean and Build all run-time stuff">
+ 	</target>
+ 	
+ 	<!-- No JUnit Test, clean previous build, compile Java source code, and make the SnappNet.jar and beauti.jar -->
+ 	<target name="build_jar_all_SnappNet_NoJUnitTest" depends="cleanSnappNet,compile-allSnappNet,dist_all_SnappNet" description="Clean and Build all run-time stuff">
+ 	</target>
+ 
+ 	<!-- compile Java source code -->
+ 	<target name="compile-allSnappNet" depends="initSnappNet,compile-all">
+ 	<!-- Capture the path as a delimited property using the refid attribute -->
+ 	<property name="myclasspath" refid="classpath"/>
+ 	<!-- Emit the property to the ant console -->
+ 	<echo message="Classpath = ${myclasspath}"/>
+ 		<mkdir dir="${buildSnappNet}" />
+ 		<!-- Compile the java code from ${srcSnappNet} into ${buildSnappNet} -->
+ 		<javac srcdir="${srcSnappNet}" destdir="${buildSnappNet}" classpathref="classpath" fork="true" memoryinitialsize="256m" memorymaximumsize="256m">
+		        <include name="beast/**/**" /> 			
+ 			<!-- compile JUnit test classes -->
+			<include name="snappNetProject/core/*.java" /> 
+			<include name="snappNetProject/matrix/*.java" />
+			<include name="snappNetProject/operators/*.java" /> 
+			<include name="beast/app/**/*.java" />
+ 			<include name="test/beast/**" />
+ 		</javac>
+ 		<echo message="Successfully compiled." />
+ 	</target>
+ 
+ 	<!-- make the beast.jar and beauti.jar -->
+ 	<target name="dist_all_SnappNet" depends="compile-allSnappNet" description="create SnappNet jar">
+ 		<!-- Create the distribution directory -->
+ 		<mkdir dir="${distSnappNet}" />
+ 		<!-- Put everything in ${buildSnappNet} into the beast.jar file -->
+ 		<jar jarfile="${distSnappNet}/SnappNet.jar">
+ 			<manifest>
+ 				<attribute name="Built-By" value="${user.name}" />
+ 				<attribute name="Main-Class" value="${main_class_BEAST}" />
+ 			</manifest>
+ 			<fileset dir="${buildSnappNet}">
+ 				<include name="beast/**/**/*.class" />
+				<include name="snappNetProject/**/*.class" />
+ 			</fileset>
+ 			<fileset dir="${beast2classpath}">
+ 				<include name="beast/**/*.class" />
+				<include name="beast/**/**/*.class" />
+				<include name="beast/**/**/**/*.class" />
+ 				<include name="beast/**/*.properties" />
+ 				<include name="beast/**/*.png" />
+ 				<include name="beagle/**/*.class" />
+ 				<include name="org/**/*.class" />
+ 			</fileset>
+ 		</jar>
+ 		<jar jarfile="${distSnappNet}/SnappNet.src.jar">
+ 			<fileset dir="${srcSnappNet}">
+			        <include name="beast/app/**/*.java" />
+				<include name="snappNetProject/core/*.java" /> 
+				<include name="snappNetProject/core/MySpeciesNetworkInitializerWithoutEmbedding.java"/>
+				<include name="snappNetProject/matrix/*.java" />
+				<include name="snappNetProject/operators/*.java" />
+ 			<!--	<include name="beast/**/*.java" />-->
+ 				<!--	<include name="beast/**/*.png" />-->
+ 				<!--	<include name="beast/**/*.xsl" />-->
+ 			</fileset>
+		</jar>
+		<echo message="SnappNet.src.jar done" />
+
+
+ 		<jar jarfile="${distSnappNet}/SnappNet.addon.jar">
+ 			<manifest>
+ 				<attribute name="Built-By" value="${user.name}" />
+ 			</manifest>
+ 			<fileset dir="${buildSnappNet}">
+			        <include name="beast/**/**/*.class" />
+				<include name="snappNetProject/**/*.class" />
+ 				<include name="util/**/*.class" />
+ 				<include name="**/*.properties" />
+ 			</fileset>
+ 		</jar>
+		<echo message="SnappNet.addon.jar done" />
+ 	</target>
+ 
+ 	<!-- run beast.jar -->
+ 	<target name="run_SnappNet">
+ 		<java jar="${distSnappNet}/SnappNet.jar" fork="true" />
+ 	</target>
+ 
+ 	<!-- JUnit test -->
+ 	<target name="junitSnappNet">
+ 		<mkdir dir="${report}" />
+ 		<junit printsummary="yes"> <!--showoutput='yes'-->
+ 			<classpath>
+ 				<path refid="classpath" />
+ 				<path location="${buildSnappNet}" />
+ 			</classpath>
+ 			<formatter type="xml" />
+ 			<batchtest fork="yes" todir="${report}">
+ 				<fileset dir="${srcSnappNet}">
+ <include name="test/**/*Test.java"/>
+ 				</fileset>
+ 				<fileset dir="${srcBeast2}">
+ <include name="test/beast/integration/**/*Test.java"/>
+ <exclude name="test/beast/integration/**/ResumeTest.java"/>
+ 				</fileset>
+ 			</batchtest>
+ 		</junit>
+ 		<echo message="JUnit test finished." />
+ 	</target>
+ <target name="junitreport">
+ 		<junitreport todir="${report}">
+ 			<fileset dir="${report}" includes="*.xml"/>
+ 			<report format="frames" todir="${report}"/>
+ 		</junitreport>
+ 		<echo message="JUnit test report finished." />
+ 	</target>
+
+ 	<target name="addon"
+ 	depends="build_jar_all_SnappNet_NoJUnitTest"
+ 	description="release BEAST 2 package version of SnappNet">
+ 		<delete dir="${Add_on_dir}" />
+ 		<!-- Create the release directory -->
+ 		<mkdir dir="${Add_on_dir}" />
+ 		<mkdir dir="${Add_on_dir}/lib" />
+ 		<mkdir dir="${Add_on_dir}/templates" />
+		<mkdir dir="${Add_on_dir}/example" />
+ 		<copy todir="${Add_on_dir}/lib">
+ 			<fileset dir="${distSnappNet}" includes="SnappNet.addon.jar" />
+			<fileset dir="${libSnappNet}" includes="*.jar" />
+ 		</copy>
+ 		<copy todir="${Add_on_dir}">
+ 			<fileset dir="${distSnappNet}" includes="SnappNet.src.jar" />
+ 		</copy>
+ 		<copy todir="${Add_on_dir}/templates">
+ 			<fileset file="templates/SnappNetTemplate.xml" />
+			<fileset file="templates/SnappNetTemplateMaxLikelihood.xml" />
+			<fileset file="templates/SnappNetTemplateExtraOptim.xml" />
+ 		</copy>
+		<copy todir="${Add_on_dir}/example">
+ 		  <fileset dir="${exampleSnappNet}" />
+ 		</copy>
+		<copy todir="${Add_on_dir}/doc">
+ 		  <fileset dir="${docSnappNet}" />
+ 		</copy>
+ 		<jar jarfile="${distSnappNet}/SnappNet.addon.zip">
+ 			<fileset dir="${Add_on_dir}">
+ 				<include name="**/*" />
+ 			</fileset>
+		</jar>
+
+ 		<echo message="Package version release is finished." />
+ 	</target>
+
+ </project>

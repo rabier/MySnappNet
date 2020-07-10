@@ -1,0 +1,29 @@
+<itsabeastystatewerein version='2.0' sample='24113'>
+<statenode id='originTime:species'>originTime:species[1 1] (0.0,Infinity): 0.1 </statenode>
+<statenode id='netDivRate:species'>netDivRate:species[1 1] (0.0,Infinity): 29.306247837891434 </statenode>
+<statenode id='turnOverRate:species'>turnOverRate:species[1 1] (0.0,1.0): 0.7273820282246194 </statenode>
+<statenode id='u'>u[1 1] (0.0,Infinity): 0.5480590559176016 </statenode>
+<statenode id='v'>v[1 1] (0.0,Infinity): 5.701933230411993 </statenode>
+<statenode id='coalescenceRate'>coalescenceRate[14 1] (0.0,10.0): 15.799673825952096 18.82145259398773 9.811913605719432 5.475152394576141 89.64154908873584 4.152603152368787 7.4936355591321915 8.47168635535458 156.94497194370192 4.370409503675487 112.11055305299206 4.370409503675487 89.64154908873584 89.64154908873584 </statenode>
+<statenode id='network:species'>((Or1:1.969618662293059,(((((Ind:0.009125684023300606,Aus:0.009125684023300606)S1:0.030248077054649138,(Or3:0.006426497865612771,Jap:0.006426497865612771)S4:0.03294726321233697)S2:0.023357830253664995)#H1[&amp;gamma=0.00914769589267328]:0.01978911677757067,Aro:0.08252070810918541)S5:0.016707335885997973,#H1:0.03649645266356864)S6:1.8703906182978756)S3:4.030381337706941)</statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"divrRateScale:species","p":0.21151945827244178,"accept":327,"reject":227,"acceptFC":112,"rejectFC":144,"rejectIv":0,"rejectOp":0},
+{"id":"turnOverScale:species","p":0.2010788807088247,"accept":268,"reject":265,"acceptFC":92,"rejectFC":134,"rejectIv":166,"rejectOp":166},
+{"id":"gammaProbUniform:species","p":"NaN","accept":7,"reject":557,"acceptFC":2,"rejectFC":246,"rejectIv":318,"rejectOp":318},
+{"id":"gammaProbRndWalk:species","p":"NaN","accept":2,"reject":568,"acceptFC":0,"rejectFC":263,"rejectIv":318,"rejectOp":318},
+{"id":"originMultiplier:species","p":1,"accept":0,"reject":271,"acceptFC":0,"rejectFC":129,"rejectIv":0,"rejectOp":0},
+{"id":"addReticulation:species","p":"NaN","accept":5,"reject":591,"acceptFC":2,"rejectFC":278,"rejectIv":162,"rejectOp":162},
+{"id":"deleteReticulation:species","p":"NaN","accept":4,"reject":584,"acceptFC":1,"rejectFC":256,"rejectIv":330,"rejectOp":330},
+{"id":"networkMultiplier:species","p":"NaN","accept":0,"reject":276,"acceptFC":0,"rejectFC":107,"rejectIv":0,"rejectOp":0},
+{"id":"flipReticulation:species","p":"NaN","accept":1,"reject":532,"acceptFC":0,"rejectFC":236,"rejectIv":433,"rejectOp":433},
+{"id":"relocateBranch:species","p":"NaN","accept":7,"reject":527,"acceptFC":3,"rejectFC":227,"rejectIv":35,"rejectOp":35},
+{"id":"nodeSlider:species","p":"NaN","accept":7,"reject":536,"acceptFC":1,"rejectFC":238,"rejectIv":0,"rejectOp":0},
+{"id":"NodeUniform:species","p":"NaN","accept":12,"reject":584,"acceptFC":2,"rejectFC":273,"rejectIv":0,"rejectOp":0},
+{"id":"relocateBranchNarrow:species","p":"NaN","accept":11,"reject":514,"acceptFC":2,"rejectFC":246,"rejectIv":87,"rejectOp":87},
+{"id":"ChangeUAndV","p":"NaN","accept":7,"reject":528,"acceptFC":0,"rejectFC":231,"rejectIv":39,"rejectOp":39},
+{"id":"ChangeGamma","p":0.08197285198788515,"accept":147,"reject":8332,"acceptFC":35,"rejectFC":3718,"rejectIv":0,"rejectOp":0},
+{"id":"ChangeAllGamma","p":"NaN","accept":66,"reject":8351,"acceptFC":18,"rejectFC":3728,"rejectIv":0,"rejectOp":0}
+]}
+-->
