@@ -5,9 +5,13 @@ See the submitted paper "On the inference of complex phylogenetic networks by Ma
 
 by Charles-Elie Rabier, Vincent Berry, Jean-Christophe Glaszmann, Fabio Pardi, Scornavacca Celine 
 
+
 ISE-M, Univ. Montpellier, CNRS, EPHE, IRD, Montpellier, France
+
 LIRMM, Univ.Montpellier, CNRS, Montpellier, France
+
 IMAG, Univ. Montpellier, CNRS, Montpellier, France
+
 AGAP, CIRAD, Montpellier, France 
 
 ***********************************************************************************************************************
