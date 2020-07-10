@@ -22,4 +22,5 @@ SnappNet is a new Bayesian method that directly relies on DNA sequences. Our met
 *************************************************************************************************************************
 
 In the folder workspace-Package-Beast/SnappNet/doc, there are some informations on how to run SnappNet
+
 SnappNet current version requires Beast 2.6.1
