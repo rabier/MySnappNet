@@ -1,0 +1,5 @@
+<package name='SnappNet' version='1.0.0'
+	 description='Bayesian inference of phylogenetic networks'
+	 projectURL='https://github.com/rabier/MySnappNet'>
+   <depends on='beast2' atleast='2.6.0'/>
+</package> 
