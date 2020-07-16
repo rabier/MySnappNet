@@ -1,4 +1,53 @@
 
+
+*********** How to install SnappNet ****************************************************************************** 
+
+-First, you have to install Beast 2 from https://www.beast2.org/
+
+-Next, you have to install the package by hand (since SnappNet paper is only submitted)
+
+  -see the section "install by hand" at https://www.beast2.org/managing-packages/
+  -let us follow the steps described on this official webpage
+
+    -Get the file SnappNet.addon.zip  located in the folder MySnappNet/workspace-Package-Beast/SnappNet/build/dist
+    -Create a SnappNet subdirectory
+
+    	    for Windows in Users\<YourName>\BEAST\2.X\SnappNet
+	    for Mac in /Users/<YourName>\/Library/Application Support/BEAST/2.X/SnappNet
+	    for Linux /home/<YourName>/.beast/2.X/SnappNet
+
+	    “2.X” the X refers to the major version of BEAST, for instance version 2.6
+     
+
+     -Next, unzip the file  SnappNet.addon.zip inside the  SnappNet directory
+     -Get the file version.xml located in MySnappNet/workspace-Package-Beast/SnappNet/release/package
+     -Copy version.xml in the SnappNet directory
+
+   -run Beauti (from the folder where Beast is installed) with the command line   ./bin/beauti 
+
+   File ---> Clear Class Paths
+   File ---> Exit
+
+   -run Beauti again  ./bin/beauti
+
+   File ----> Template 
+   You should now see SnappNetTemplate  
+
+   File ----> Manage Packages
+   You should now see SnappNet
+   
+- Read our manual  "A rough Guide To SnappNet" to learn how to use the package
+
+
+
+
+*********************************************************************************************************************
+
+***************** Below are informations for developpers willing to use eclipse ***************************************
+
+** we describe the debug configuration used for the project
+
+
 cd ~/workspace-Package-Beast/SnappNet/deliverable
 
 
