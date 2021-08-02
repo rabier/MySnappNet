@@ -1,11 +1,19 @@
-# MySnappNet
-SnappNet is a new Bayesian method dedicated to phylogenetic network inference
+# SnappNet
+SnappNet is a Bayesian method dedicated to phylogenetic network inference, and proposed in 2021
 
 ******************************************************************************************************************
-SnappNet is described in the submitted paper "On the inference of complex phylogenetic networks by Markov Chain Monte-Carlo"
+SnappNet is described in the paper entitled "On the inference of complex phylogenetic networks by Markov Chain Monte-Carlo"
+and published in Plos Computational Biology (2021).
 
-        by Charles-Elie Rabier, Vincent Berry, Jean-Christophe Glaszmann, Fabio Pardi, Scornavacca Celine 
+        The authors are
 
+                Charles-Elie Rabier, Vincent Berry, 
+                Marnus Stoltz, Joao D Santos, 
+                Wensheng Wang, Jean-Christophe Glaszmann, 
+                Fabio Pardi, Scornavacca Celine 
+
+        
+        from
 
               ISE-M, Univ. Montpellier, CNRS, EPHE, IRD, Montpellier, France
 
@@ -14,6 +22,8 @@ SnappNet is described in the submitted paper "On the inference of complex phylog
               IMAG, Univ. Montpellier, CNRS, Montpellier, France
 
               AGAP, CIRAD, Montpellier, France 
+              
+              ICS, Chinese Academy of Agricultural Sciences, Beijing, China
 
 ***********************************************************************************************************************
 
