@@ -9,7 +9,7 @@
   -see the section "install by hand" at https://www.beast2.org/managing-packages/
   -let us follow the steps described on this official webpage
 
-    -Get the file SnappNet.addon.zip  located in the folder MySnappNet/workspace-Package-Beast/SnappNet/build/dist
+    -Get the file SnappNet.addon.zip  located in the folder MySnappNet/workspace-Package-Beast/SnappNet/tmp
     -Create a SnappNet subdirectory
 
     	    for Windows in Users\<YourName>\BEAST\2.X\SnappNet
@@ -37,7 +37,7 @@
    You should now see SnappNet
    
 - Read our manual  "A rough Guide To SnappNet" to learn how to use the package
-
+ (fyi, SnappNetProjectToRun.jar is located in MySnappNet/workspace-Package-Beast/SnappNet/deliverable/).
 
 
 
