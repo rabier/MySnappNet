@@ -37,5 +37,5 @@ In the folder workspace-Package-Beast/SnappNet/example, you will find the rice r
 SnappNet current version requires Beast 2.6.1
 
 ***************************************************************************************************************************
-Some extra informations are given at http://charles-elie.rabier.pagesperso-orange.fr/doc/SnappNet.html . Be careful xml informations are linked to another project
+Some extra informations are given at https://rabier.github.io/doc/SnappNet.html . Be careful xml informations are linked to another project
 called SnappNetForSimSnappNet (also available on github) that we used for analyzing simulated data
